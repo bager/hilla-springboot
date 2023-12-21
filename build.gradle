@@ -6,7 +6,9 @@ buildscript {
 }
 plugins {
 	id 'java'
+	// https://plugins.gradle.org/plugin/org.springframework.boot
 	id 'org.springframework.boot' version '3.2.0'
+	// https://plugins.gradle.org/plugin/io.spring.dependency-management
 	id 'io.spring.dependency-management' version '1.1.4'
 	id 'dev.hilla' version "$hillaVersion"
 }
@@ -14,20 +16,37 @@ plugins {
 repositories {
 	mavenCentral()
 	maven { setUrl("https://maven.vaadin.com/vaadin-prereleases") }
+	maven { setUrl("https://maven.vaadin.com/vaadin-addons") }
+}
 
-	maven {
-		setUrl("https://maven.vaadin.com/vaadin-addons")
-	}
+java {
+	sourceCompatibility = '21'
 }
 
 dependencies {
 	implementation 'dev.hilla:hilla-react-spring-boot-starter'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+//	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation('org.springframework.boot:spring-boot-starter-test') {
+		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+	}
+
+	compileOnly("org.projectlombok:lombok")
+	annotationProcessor("org.projectlombok:lombok")
+
+	runtimeOnly('org.postgresql:postgresql')
+	// https://mvnrepository.com/artifact/com.github.gavlyukovskiy/p6spy-spring-boot-starter
+	implementation('com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.1')
 }
 
 dependencyManagement {
 	imports {
 		mavenBom "dev.hilla:hilla-bom:$hillaVersion"
 	}
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
 }
